@@ -4,11 +4,11 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-def _init_dft_mat(dimension: int):
+def _init_dft_mat(dimension: int) -> NDArray[np.complex128]:
     xi, yi = np.mgrid[:dimension,:dimension]
     return np.exp(-2j * (np.pi / dimension) * xi * yi)
 
-def _init_twiddle_factors(dimension: int):
+def _init_twiddle_factors(dimension: int) -> NDArray[np.complex128]:
     # return np.fromiter((np.exp(-2j * (np.pi / dimension) * i) for i in range(dimension // 2)), dtype=np.complex128)
     return np.exp(-2j * (np.pi / dimension) * np.arange(dimension // 2, dtype=np.complex128))
 
@@ -45,16 +45,17 @@ def stft(
     elif hop_size < 1:
         raise ValueError("'hop_size' must be positive")
     
+    frames = np.floor((signal.shape[0] - window_length) / hop_size) + 1
     window_length = window.shape[0]
     if np.log2(window_length).is_integer():
         fourier_transform = fft
     else:
         fourier_transform = dft
 
-    coefs = []
-    frame_index = -1
-    while (frame_index := frame_index + 1) * hop_size + window_length < signal.shape[0]:
-        windowed_sig = signal[frame_index * hop_size:window_length + frame_index * hop_size] * np.conjugate(window)
-        coefs.append(fourier_transform(windowed_sig))
+    
+    mask_idx = hop_size * np.arange(frames, dtype=np.int64)[:, None] +\
+               np.arange(window_length, dtype=np.int64)
+    slided_signal = signal[mask_idx].T
+    windowed_sig_by_frame = np.conjugate(window.reshape((window_length, 1))) * slided_signal
 
-    return np.array(coefs).T
+    return np.apply_along_axis(fourier_transform, 0, windowed_sig_by_frame)
