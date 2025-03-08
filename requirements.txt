@@ -1,0 +1,8 @@
+# Math library
+numpy
+
+# Visualisation libraries
+matplotlib
+
+# Music and audio analysis library
+librosa [security]
