@@ -3,7 +3,7 @@ import numpy as np
 from fourier_transform.utils import init_dft_mat, init_twiddle_factors
 
 from numpy.typing import NDArray
-from typing import Callable
+
 
 def dft(signal: NDArray[np.complex128]):
     dft_mat = init_dft_mat(signal.shape[0])
@@ -49,4 +49,4 @@ def stft(
         windowed_sig = signal[frame_index * hop_size:window_length + frame_index * hop_size] * np.conjugate(window)
         coefs.append(fourier_transform(windowed_sig))
 
-    return np.array(coefs).T[::-1]
+    return np.array(coefs).T
