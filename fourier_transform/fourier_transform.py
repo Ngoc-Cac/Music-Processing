@@ -1,12 +1,20 @@
 import numpy as np
 
-from fourier_transform.utils import init_dft_mat, init_twiddle_factors
 
 from numpy.typing import NDArray
 
 
+def _init_dft_mat(dimension: int):
+    xi, yi = np.mgrid[:dimension,:dimension]
+    return np.exp(-2j * (np.pi / dimension) * xi * yi)
+
+def _init_twiddle_factors(dimension: int):
+    # return np.fromiter((np.exp(-2j * (np.pi / dimension) * i) for i in range(dimension // 2)), dtype=np.complex128)
+    return np.exp(-2j * (np.pi / dimension) * np.arange(dimension // 2, dtype=np.complex128))
+
+
 def dft(signal: NDArray[np.complex128]):
-    dft_mat = init_dft_mat(signal.shape[0])
+    dft_mat = _init_dft_mat(signal.shape[0])
     return dft_mat @ signal
 
 
@@ -23,7 +31,7 @@ def _inner_fft(signal: NDArray[np.complex128]):
     
     A_mat = _inner_fft(signal[:dim-1:2])
     B_mat = _inner_fft(signal[1:dim:2])
-    C_mat = init_twiddle_factors(dim) * B_mat
+    C_mat = _init_twiddle_factors(dim) * B_mat
 
     return np.concatenate([A_mat + C_mat, A_mat-C_mat])
 
