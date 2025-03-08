@@ -38,6 +38,7 @@ def spectrogram(
     show_frequency: bool = True,
     show_decibels: bool = True,
     *,
+    decibel_thres = -12,
     cmap: str = 'gray_r',
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
@@ -45,7 +46,7 @@ def spectrogram(
 ) -> Axes:
     intensities = np.abs(stft_coefs) ** 2
     if show_decibels:
-        intensities = convert_to_decibels(intensities)
+        intensities = convert_to_decibels(intensities, threshold=decibel_thres)
 
     
     if ax is None:
@@ -74,6 +75,7 @@ def LF_spectrogram(
     show_realtime: bool = True,
     show_decibels: bool = True,
     *,
+    decibel_thres = -12,
     cmap: str = 'gray_r',
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
@@ -83,7 +85,7 @@ def LF_spectrogram(
     lf_coefs = _compute_LF(stft_coefs, sampling_rate, window_length,
                            reference_pitch=reference_pitch)
     if show_decibels:
-        intensities = convert_to_decibels(intensities)
+        intensities = convert_to_decibels(intensities, threshold=decibel_thres)
 
 
     if ax is None:
@@ -110,6 +112,7 @@ def chromagram(
     show_realtime: bool = True,
     show_decibels: bool = True,
     *,
+    decibel_thres = -12,
     cmap: str = 'gray_r',
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
@@ -123,7 +126,7 @@ def chromagram(
         chroma_coefs[chroma] = lf_coefs[(_MIDI_NOTE_RANGE % 12) == chroma].sum(axis=0)
 
     if show_decibels:
-        intensities = convert_to_decibels(intensities)
+        intensities = convert_to_decibels(intensities, threshold=decibel_thres)
 
 
     if ax is None:
