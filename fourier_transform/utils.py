@@ -1,6 +1,7 @@
 import numpy as np
 
 from numbers import Number
+from numpy.typing import NDArray
 
 def midi_pitch(
     note_number: Number,
@@ -10,17 +11,12 @@ def midi_pitch(
 ):
     return 2 ** ((note_number - reference_note)/ 12) * reference_pitch
 
-def init_dft_mat(dimension: int):
-    if not isinstance(dimension, int):
-        raise TypeError("'dimension' must be a positive integer")
-    elif dimension < 1:
-        raise TypeError("'dimension' must be positive")
-    
-    dft_matrix = np.ndarray((dimension, dimension))
-    for i in range(dimension):
-        for j in range(dimension):
-            dft_matrix[i, j] = np.exp(-2j * (np.pi / dimension) * i * j)
-    return dft_matrix
+def convert_to_decibels(intensities: NDArray, *, threshold: float = -12):
+    """
+    threshold should be powers of 10
+    """
+    # eps is to avoid division by 0 if intensities = 0
+    return 10 * (np.log10(intensities + np.finfo(float).eps) - threshold)
 
-def init_twiddle_factors(dimension: int):
-    return np.fromiter((np.exp(-2j * (np.pi / dimension) * i) for i in range(dimension // 2)), dtype=np.complex128)
+def logarithmic_compress(values: NDArray, gamma: float):
+    return np.log(1 + gamma * values)
