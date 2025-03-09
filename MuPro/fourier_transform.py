@@ -9,21 +9,8 @@ def _init_dft_mat(dimension: int) -> NDArray[np.complex128]:
     return np.exp(-2j * (np.pi / dimension) * xi * yi)
 
 def _init_twiddle_factors(dimension: int) -> NDArray[np.complex128]:
-    # return np.fromiter((np.exp(-2j * (np.pi / dimension) * i) for i in range(dimension // 2)), dtype=np.complex128)
     return np.exp(-2j * (np.pi / dimension) * np.arange(dimension // 2, dtype=np.complex128))
 
-
-def dft(signal: NDArray[np.complex128]):
-    dft_mat = _init_dft_mat(signal.shape[0])
-    return dft_mat @ signal
-
-
-def fft(signal: NDArray[np.complex128]):
-    log_2N = np.log2(signal.shape[0])
-    if not log_2N.is_integer():
-        raise ValueError('Fast Fourier Transform can only be applied on signal length of powers of two')
-    return _inner_fft(signal)
-    
 def _inner_fft(signal: NDArray[np.complex128]):
     dim = signal.shape[0]
     if dim == 1:
@@ -34,6 +21,17 @@ def _inner_fft(signal: NDArray[np.complex128]):
     C_mat = _init_twiddle_factors(dim) * B_mat
 
     return np.concatenate([A_mat + C_mat, A_mat-C_mat])
+
+
+def dft(signal: NDArray[np.complex128]):
+    dft_mat = _init_dft_mat(signal.shape[0])
+    return dft_mat @ signal
+
+def fft(signal: NDArray[np.complex128]):
+    log_2N = np.log2(signal.shape[0])
+    if not log_2N.is_integer():
+        raise ValueError('Fast Fourier Transform can only be applied on signal length of powers of two')
+    return _inner_fft(signal)
 
 def stft(
     signal: NDArray[np.complex128],
