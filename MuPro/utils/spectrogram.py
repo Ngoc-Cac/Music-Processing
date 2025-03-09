@@ -15,7 +15,6 @@ def spectrogram(
     hop_size: int,
     show_realtime: bool = True,
     show_frequency: bool = True,
-    show_decibels: bool = True,
     *,
     cmap: str = 'gray_r',
     vmin: Optional[float] = None,
@@ -37,7 +36,7 @@ def spectrogram(
     ax.set_ylabel(f'Frequency ({'Hz' if show_frequency else 'index'})')
     ax.set_xlabel(f'Time ({'seconds' if show_realtime else 'frames'})')
     ax.get_figure().colorbar(img, orientation='vertical')\
-                   .set_label(f"Magnitude {'(dB)' if show_decibels else ''}")
+                   .set_label(f"Magnitude")
     return ax
 
 def LF_spectrogram(
@@ -46,7 +45,6 @@ def LF_spectrogram(
     window_length: int,
     hop_size: int,
     show_realtime: bool = True,
-    show_decibels: bool = True,
     *,
     cmap: str = 'gray_r',
     vmin: Optional[float] = None,
@@ -66,7 +64,7 @@ def LF_spectrogram(
     ax.set_ylabel(f'Frequency (MIDI pitch)')
     ax.set_xlabel(f'Time ({'seconds' if show_realtime else 'frames'})')
     cbar = ax.get_figure().colorbar(img, orientation='vertical')
-    cbar.set_label(f'Magnitude {'(dB)' if show_decibels else ''}')
+    cbar.set_label(f'Magnitude')
     return ax
 
 def chromagram(
@@ -75,7 +73,6 @@ def chromagram(
     window_length: int,
     hop_size: int,
     show_realtime: bool = True,
-    show_decibels: bool = True,
     *,
     cmap: str = 'gray_r',
     vmin: Optional[float] = None,
@@ -96,5 +93,5 @@ def chromagram(
     ax.set_ylabel(f'Chroma')
     ax.set_yticks(np.arange(1, 13), ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'])
     cbar = ax.get_figure().colorbar(img, orientation='vertical')
-    cbar.set_label(f'Magnitude {'(dB)' if show_decibels else ''}')
+    cbar.set_label(f'Magnitude')
     return ax
