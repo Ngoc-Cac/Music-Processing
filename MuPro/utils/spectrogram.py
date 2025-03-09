@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from MuPro.utils.utilities import convert_to_decibels, to_LF, to_chroma, normalize_mat
 
 from numpy.typing import NDArray
 from numbers import Number
