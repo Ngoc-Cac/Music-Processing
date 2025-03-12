@@ -5,4 +5,4 @@ numpy
 matplotlib
 
 # Music and audio analysis library
-librosa [security]
+librosa [security] >= 0.11
