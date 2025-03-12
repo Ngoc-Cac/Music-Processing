@@ -45,7 +45,7 @@ def threshold_ssm(
         threshold = np.percentile(ssm, threshold, axis=None if global_thresholding else 0)
         if not col_thres is None:
             col_thres = np.percentile(ssm, col_thres, axis=None if global_thresholding else 0)
-    thresholded = ssm
+    thresholded = np.array(ssm)
 
     if global_thresholding:
         thresholded[ssm <= threshold] = 0
