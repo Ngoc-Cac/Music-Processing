@@ -1,7 +1,7 @@
 import numpy as np
 
 from numpy.typing import NDArray
-from typing import Optional
+from typing import Optional, Iterable
 
 def threshold_ssm(
     ssm: NDArray,
@@ -62,3 +62,29 @@ def threshold_ssm(
     thresholded[thresholded <= 0] = penalty
 
     return thresholded
+
+def compute_score(
+    segmented_ssm: NDArray,
+    *,
+    step_sizes: Optional[Iterable[tuple[int, int]]] = None
+):
+    # if step_sizes is None:
+    #     step_sizes = ((1, 1), (1, 2), (2, 1))
+
+    # step_sizes = np.array(step_sizes)
+    step_sizes = np.array(((1, 1), (1, 2), (2, 1)))
+    row_steps = step_sizes[:, 0]
+    col_steps = step_sizes[:, 1]
+
+
+    accum_score = np.zeros(segmented_ssm.shape)
+    accum_score[0, 1] = segmented_ssm[0, 0]
+    accum_score[0, 2:] = -np.inf
+
+    for i in range(1, accum_score.shape[0]):
+        accum_score[i, 0] = np.max(accum_score[i - 1, [0, -1]])
+        accum_score[i, 1] = accum_score[i, 0] + segmented_ssm[i, 0]
+        for j in range(2, accum_score.shape[1]):
+            accum_score[i, j] = segmented_ssm[i, j] + np.max(accum_score[i - row_steps, j - col_steps])
+
+    return accum_score, np.max(accum_score[-1, [0, -1]])
