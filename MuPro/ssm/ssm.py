@@ -63,11 +63,18 @@ def threshold_ssm(
 
     return thresholded
 
+
+def get_induced_segments(
+    paths: Iterable[tuple[int, int]]
+):
+    induced_segment_fam = np.zeros((len(paths), 2), dtype=np.int64)
+    for i, path in enumerate(paths):
+        induced_segment_fam[i] = path[0][0], path[-1][0]
+    return induced_segment_fam
+
 def compute_score(
     segmented_ssm: NDArray,
-    *,
-    step_sizes: Optional[Iterable[tuple[int, int]]] = None
-):
+) -> tuple[NDArray, np.number]:
     # if step_sizes is None:
     #     step_sizes = ((1, 1), (1, 2), (2, 1))
 
@@ -77,14 +84,52 @@ def compute_score(
     col_steps = step_sizes[:, 1]
 
 
-    accum_score = np.zeros(segmented_ssm.shape)
+    accum_score = -np.ones((segmented_ssm.shape[0], segmented_ssm.shape[1] + 1)) * np.inf
+    accum_score[0, 0] = 0
     accum_score[0, 1] = segmented_ssm[0, 0]
-    accum_score[0, 2:] = -np.inf
 
     for i in range(1, accum_score.shape[0]):
         accum_score[i, 0] = np.max(accum_score[i - 1, [0, -1]])
         accum_score[i, 1] = accum_score[i, 0] + segmented_ssm[i, 0]
         for j in range(2, accum_score.shape[1]):
-            accum_score[i, j] = segmented_ssm[i, j] + np.max(accum_score[i - row_steps, j - col_steps])
+            accum_score[i, j] = segmented_ssm[i, j - 1] + np.max(accum_score[i - row_steps, j - col_steps])
 
     return accum_score, np.max(accum_score[-1, [0, -1]])
+
+def get_optimal_path(
+    accum_score: NDArray,
+) -> list[tuple[int, int]]:
+    max_col = accum_score.shape[1] - 1
+
+    step_sizes = np.array(((1, 1), (1, 2), (2, 1)))
+    row_steps = step_sizes[:, 0]
+    col_steps = step_sizes[:, 1]
+
+    path_family = []
+    cur_path = []
+    row, col = accum_score.shape[0], 0
+    while row != 0 or col != 0:
+        if row == 0 or col == 1:
+            col -= 1
+        elif col == 0:
+            row -= 1
+            if accum_score[row, 0] <= accum_score[row, max_col]:
+                col = max_col
+                
+                cur_path.reverse()
+                cur_path = [(row, col - 1)]
+                path_family.append(cur_path)
+        else:
+            row_indices = row - row_steps
+            col_indices = col - col_steps
+            mask = (row_indices >= 0) & (col_indices >= 0)
+
+            step_index = np.argmax(accum_score[row_indices[mask], col_indices[mask]])
+            row -= row_steps[step_index]
+            col -= col_steps[step_index]
+
+            cur_path.append((row, col - 1))
+
+    cur_path.reverse()
+    path_family.reverse()
+    return path_family
