@@ -1,7 +1,7 @@
 import numpy as np
 
 from numpy.typing import NDArray
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Literal
 
 def threshold_ssm(
     ssm: NDArray,
@@ -133,3 +133,26 @@ def get_optimal_path(
     cur_path.reverse()
     path_family.reverse()
     return path_family
+
+def compute_fitness(
+    ssm: NDArray,
+    segment: tuple[int, int]
+) -> dict[Literal['score', 'score_matrix', 'normalized_score', 'normalized_coverage', 'fitness']]:
+    segmented_ssm = ssm[:, segment[0]:(segment[1] + 1)]
+    score_mat, score = compute_score(segmented_ssm)
+    path_family = get_optimal_path(score_mat)
+
+    normalized_score = (score - segmented_ssm.shape[1]) / sum(len(path) for path in path_family)
+
+    induced_family = get_induced_segments(path_family)
+    coverage = np.sum(induced_family[:, 1] - induced_family[:, 0])
+    normalized_cov = (coverage - segmented_ssm.shape[1]) / ssm.shape[0]
+
+    fitness = 2 * normalized_cov * normalized_score / (normalized_score + normalized_cov)
+    return {
+        'score': score,
+        'score_matrix': score_mat,
+        'normalized_score': normalized_score,
+        'normalized_coverage': normalized_cov,
+        'fitness': fitness
+    }
