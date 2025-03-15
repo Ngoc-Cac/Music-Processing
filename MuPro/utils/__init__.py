@@ -14,3 +14,7 @@ from MuPro.utils.pitches import (
 from MuPro.utils.mat_op import (
     normalize_column
 )
+
+from MuPro.utils.chords import (
+    get_chord_template
+)
