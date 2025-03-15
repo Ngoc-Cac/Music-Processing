@@ -28,7 +28,7 @@ def threshold_ssm(
         threshold applies thresholding on values as raw. Relative threshold uses the threshold as
         percentile where only values above said percentiles is kept.
         
-        For example, if `threshold=0.5`, relative thresholding will keep the top 50% highest cells.
+        For example, if `threshold=0.2`, relative thresholding will keep the top 20% highest cells.
         This parameter defaults to `False`.
     :param bool rescale_thresholding: Whether or not to rescale the SSM after thresholding.
         This rescales all thersholded values to the range [0, 1]. This defaults to `False`.
@@ -40,9 +40,9 @@ def threshold_ssm(
     :rtype: numpy.NDArray
     """
     if relative_thresholding:
-        threshold = np.percentile(ssm, threshold, axis=None if global_thresholding else 0)
+        threshold = np.percentile(ssm, 1-threshold, axis=None if global_thresholding else 0)
         if not col_thres is None:
-            col_thres = np.percentile(ssm, col_thres, axis=None if global_thresholding else 0)
+            col_thres = np.percentile(ssm, 1-col_thres, axis=None if global_thresholding else 0)
     thresholded = np.array(ssm)
 
     if global_thresholding:
@@ -52,7 +52,7 @@ def threshold_ssm(
         col_threshold = row_threshold.T if col_thres is None else np.tile(col_thres, (1, ssm.shape[0]))
         mask = ssm > row_threshold
         mask = (mask & (ssm > col_threshold))
-        thresholded = 0
+        thresholded[mask] = 0
 
     if rescale_thresholded:
         minimum = np.min(thresholded[thresholded != 0])
