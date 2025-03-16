@@ -5,6 +5,7 @@ from numpy.typing import NDArray
 
 
 _MIDI_NOTE_RANGE = np.arange(128)
+_NOTE_LABELS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 def midi_pitch(
     note_number: Number,

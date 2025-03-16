@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from MuPro.utils import _NOTE_LABELS
 
 from numpy.typing import NDArray
 from numbers import Number
@@ -91,7 +92,7 @@ def chromagram(
     
     ax.set_xlabel(f'Time ({'seconds' if show_realtime else 'frames'})')
     ax.set_ylabel(f'Chroma')
-    ax.set_yticks(np.arange(1, 13), ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'])
+    ax.set_yticks(np.arange(1, 13), _NOTE_LABELS)
     cbar = ax.get_figure().colorbar(img, orientation='vertical')
     cbar.set_label(f'Magnitude')
     return ax
