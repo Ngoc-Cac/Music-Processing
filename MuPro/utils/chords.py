@@ -2,11 +2,16 @@ import numpy as np
 
 from copy import deepcopy
 
-from MuPro.utils import tranpose_chromas
-
+from MuPro.utils import (
+    _NOTE_LABELS,
+    tranpose_chromas
+)
 
 from numpy.typing import NDArray
 
+
+_MAJOR_MIN_LABELS = deepcopy(_NOTE_LABELS)
+_MAJOR_MIN_LABELS.extend(note + 'm' for note in _NOTE_LABELS)
 
 _BINARY_CHROMA_TEMPLATE = [np.zeros((12, 1))]
 # Major chords
@@ -23,6 +28,6 @@ for _ in range(11):
 def get_chord_template(
     chroma: bool = True,
     binary: bool = True
-) -> list[NDArray[np.float64]]:
+) -> tuple[list[NDArray[np.float64]], list[str]]:
     if chroma:
-        return deepcopy(_BINARY_CHROMA_TEMPLATE)
+        return deepcopy(_BINARY_CHROMA_TEMPLATE), deepcopy(_MAJOR_MIN_LABELS)
