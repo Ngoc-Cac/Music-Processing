@@ -3,6 +3,7 @@ from MuPro.utils import (
 )
 
 from MuPro.utils.pitches import (
+    _NOTE_LABELS,
     convert_to_decibels,
     logarithmic_compress,
     midi_pitch,
@@ -12,7 +13,8 @@ from MuPro.utils.pitches import (
 )
 
 from MuPro.utils.mat_op import (
-    normalize_column
+    normalize_column,
+    smooth_mat
 )
 
 from MuPro.utils.chords import (
