@@ -1,9 +1,12 @@
+# Private attributes
+from MuPro.utils.pitches import _NOTE_LABELS
+
+
 from MuPro.utils import (
     spectrogram
 )
 
 from MuPro.utils.pitches import (
-    _NOTE_LABELS,
     convert_to_decibels,
     logarithmic_compress,
     midi_pitch,
